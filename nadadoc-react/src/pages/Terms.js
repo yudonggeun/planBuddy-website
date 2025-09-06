@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import ReactMarkdown from 'react-markdown';
 
 const Terms = () => {
     const [content, setContent] = useState('');
@@ -11,7 +12,10 @@ const Terms = () => {
 
     useEffect(() => {
         const fetchContent = async () => {
-            let url = `/content/term-of-use.${lang}.html`;
+            const isKorean = lang === 'ko';
+            const fileExtension = isKorean ? 'md' : 'html';
+            let url = `/content/term-of-use.${lang}.${fileExtension}`;
+            
             try {
                 const response = await fetch(url);
                 if (!response.ok) {
@@ -25,7 +29,7 @@ const Terms = () => {
                 const text = await response.text();
                 setContent(text);
             } catch (error) {
-                setContent('<p>Could not load terms.</p>');
+                setContent(isKorean ? '이용약관을 불러올 수 없습니다.' : '<p>Could not load terms.</p>');
             }
         };
 
@@ -34,11 +38,15 @@ const Terms = () => {
 
     return (
         <div className="container mx-auto p-4">
-            <div className="language-switcher mb-4">
+            <div className="language-switcher mb-4 flex justify-end">
                 <button onClick={() => setLang('en')} className={`px-4 py-2 rounded ${lang === 'en' ? 'bg-blue-500 text-white' : 'bg-gray-200'}`}>English</button>
                 <button onClick={() => setLang('ko')} className={`px-4 py-2 rounded ml-2 ${lang === 'ko' ? 'bg-blue-500 text-white' : 'bg-gray-200'}`}>한국어</button>
             </div>
-            <article className="prose lg:prose-xl" dangerouslySetInnerHTML={{ __html: content }} />
+            {lang === 'ko' ? (
+                 <article className="prose lg:prose-xl"><ReactMarkdown children={content} /></article>
+            ) : (
+                <article className="prose lg:prose-xl" dangerouslySetInnerHTML={{ __html: content }} />
+            )}
         </div>
     );
 };
