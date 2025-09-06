@@ -2,18 +2,15 @@ import React, { useState, useEffect } from 'react';
 import ReactMarkdown from 'react-markdown';
 
 const Terms = () => {
+    const [lang, setLang] = useState(() => navigator.language.startsWith('ko') ? 'ko' : 'en');
     const [content, setContent] = useState('');
-    const [lang, setLang] = useState('en');
-
-    useEffect(() => {
-        const detectedLang = navigator.language.startsWith('ko') ? 'ko' : 'en';
-        setLang(detectedLang);
-    }, []);
 
     useEffect(() => {
         const fetchContent = async () => {
             const isKorean = lang === 'ko';
             const fileExtension = isKorean ? 'md' : 'html';
+            setContent(isKorean ? '로딩 중...' : 'Loading...');
+
             let url = `/content/term-of-use.${lang}.${fileExtension}`;
             
             try {
